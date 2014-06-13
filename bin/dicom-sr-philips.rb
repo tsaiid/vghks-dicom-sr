@@ -1,3 +1,4 @@
+=begin
 require 'dicom'
 include DICOM
 
@@ -18,15 +19,15 @@ NV = "0040,A30A"          # numeric_value
 # read file
 dcm_path = "1.2.840.113663.1500.1.341633854.8.1.20140612.101117.250.dcm"
 dcm = DObject.read(dcm_path)
+=end
 
-
-def find_patient_characteristics_item(dcm)
+def pms_find_patient_characteristics_item(dcm)
   dcm[CS].each_item do |item|
     return item if item[CNCS].items[0][CM].value == 'Patient Characteristics'
   end
 end
 
-def find_findings_item(dcm)
+def pms_find_findings_item(dcm)
   dcm[CS].each_item do |item|
     return item if item[CNCS].items[0][CM].value == 'Findings'
   end
@@ -34,7 +35,7 @@ def find_findings_item(dcm)
   nil
 end
 
-def find_user_defined_concepts_item(dcm)
+def pms_find_user_defined_concepts_item(dcm)
   dcm[CS].each_item do |item|
     return item if item[CNCS].items[0][CM].value == 'User-defined concepts'
   end
@@ -43,7 +44,7 @@ def find_user_defined_concepts_item(dcm)
 end
 
 
-def get_measurements(findings_item)
+def pms_get_measurements(findings_item)
   results = []
   unless findings_item.nil?
     findings_item[CS].each_item do |item|
@@ -65,7 +66,7 @@ def get_measurements(findings_item)
   results.empty? ? nil : results
 end
 
-def get_user_defined_measurements_calculations(udm_item)
+def pms_get_user_defined_measurements_calculations(udm_item)
   results = []
   udm_item[CS].each_item do |item|
     has_measure = (
@@ -89,6 +90,7 @@ def get_user_defined_measurements_calculations(udm_item)
   results.empty? ? nil : results
 end
 
+=begin
 # get patient characteristics item
 pc_item = find_patient_characteristics_item(dcm)
 fi_item = find_findings_item(dcm)
@@ -97,3 +99,4 @@ ud_item = find_user_defined_concepts_item(dcm)
 # output
 p get_measurements(fi_item)
 p get_user_defined_measurements_calculations(ud_item)
+=end

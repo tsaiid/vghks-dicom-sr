@@ -1,3 +1,4 @@
+=begin
 require 'dicom'
 include DICOM
 
@@ -16,16 +17,18 @@ MUCS = "0040,08EA"        # measurement_unit_code_sequence
 NV = "0040,A30A"          # numeric_value
 MMN = "0008,1090"         # manufacturer model name
 VT = "0040,A170"          # Value Type
+M = "0008,0070"           # manufacturer
 
 # read file
 dcm_path = "2.dcm"
 dcm = DObject.read(dcm_path)
+=end
 
 # 43128: measured value
 # 43130: side
 # 43133: site
 
-def find_code_value_item(items, code_value)
+def gms_find_code_value_item(items, code_value)
   items.each_item do |item|
     return item if item[CNCS] && item[CNCS].items[0][CV].value == code_value
   end
@@ -33,32 +36,32 @@ def find_code_value_item(items, code_value)
   nil
 end
 
-def get_side(cs_items)
-  side_item = find_code_value_item(cs_items, "43130")
+def gms_get_side(cs_items)
+  side_item = gms_find_code_value_item(cs_items, "43130")
   side = side_item.nil? ? nil : side_item[TV].value[5..-1]
 end
 
-def get_site(cs_items)
-  site_item = find_code_value_item(cs_items, "43133")
+def gms_get_site(cs_items)
+  site_item = gms_find_code_value_item(cs_items, "43133")
   site = site_item.nil? ? nil : site_item[TV].value
 end
 
-def get_measurement(cs_items)
-  m_item = find_code_value_item(cs_items, "43128")
+def gms_get_measurement(cs_items)
+  m_item = gms_find_code_value_item(cs_items, "43128")
   value = m_item.nil? ? nil : m_item[MVS].items[0][NV].value
   unit = m_item.nil? ? nil : m_item[MVS].items[0][MUCS].items[0][CV].value
   { value: value, unit: unit }
 end
 
-def get_all_measurements(items)
+def gms_get_all_measurements(items)
   results = []
   unless items.nil?
     items.each_item do |item|
       has_content = item[CS].nil?
       unless has_content
-        side = get_side(item[CS])
-        site = get_site(item[CS])
-        measure = get_measurement(item[CS])
+        side = gms_get_side(item[CS])
+        site = gms_get_site(item[CS])
+        measure = gms_get_measurement(item[CS])
 
         result = {
           side:     side,
@@ -75,5 +78,7 @@ def get_all_measurements(items)
   results.empty? ? nil : results
 end
 
+=begin
 # output
 p get_all_measurements(dcm[CS])
+=end
