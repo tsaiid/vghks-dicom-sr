@@ -1,3 +1,9 @@
+GIT
+  remote: git://github.com/dicom/ruby-dicom.git
+  revision: 8af6f3efa1329e2d9a355be73a5ebc427fda682a
+  specs:
+    dicom (0.9.6b)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -114,6 +120,7 @@ PLATFORMS
 
 DEPENDENCIES
   coffee-rails (~> 4.0.0)
+  dicom!
   jbuilder (~> 2.0)
   jquery-rails
   rails (= 4.1.1)
