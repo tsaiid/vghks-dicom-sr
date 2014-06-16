@@ -18,6 +18,7 @@ def parse_dcm(path)
     manufacturer = dcm[Ma].value
 
     p path
+    p dcm.value(SD)
 
     case manufacturer
     when "Philips Medical Systems"
