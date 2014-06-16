@@ -11,18 +11,13 @@ DICOM.logger.level = Logger::ERROR
 require 'json'
 require 'yaml'
 
-
-# read file
-dcm_path = "/Users/tsaiid/Dropbox/dcm"
-#dcm = DObject.read(dcm_path)
-
-Dir.glob(dcm_path + "/*.dcm").each do |file|
-  dcm = DObject.read(file)
+def parse_dcm(path)
+  dcm = DObject.read(path)
 
   if dcm[Mo].value == "SR"
     manufacturer = dcm[Ma].value
 
-    p file
+    p path
 
     case manufacturer
     when "Philips Medical Systems"
@@ -37,6 +32,16 @@ Dir.glob(dcm_path + "/*.dcm").each do |file|
       p "#{manufacturer} is not supported yet."
     end
   end
+end
 
-  #p dcm[M].value + "::" + dcm[MMN].value
+# if given a file, parse it only, else parse the whole directory
+if ARGV.first.nil?
+  # read file
+  dcm_path = "/Users/tsaiid/Dropbox/dcm"
+
+  Dir.glob(dcm_path + "/*.dcm").each do |file|
+    parse_dcm(file)
+  end
+else
+  parse_dcm(ARGV.first)
 end
