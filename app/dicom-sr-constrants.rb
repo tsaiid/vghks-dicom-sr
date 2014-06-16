@@ -14,3 +14,4 @@ Mo = "0008,0060"          # modality
 SV = "0018,1020"          # Software Version
 CCS = "0040,A168"         # Concept Code Sequence
 AN = "0008,0050"          # Accession Number
+SD = "0008,1030"          # StudyDescription
