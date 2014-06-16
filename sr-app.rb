@@ -16,14 +16,14 @@ class DicomSR < Sinatra::Base
 
   configure do
     # read config file
-    cfg = YAML.load_file('app/config.yaml')
+    cfg = YAML.load_file('../../shared/config.yaml')
 
     # set server info
     set :pacs_ip => cfg['pacs']['ip'], :pacs_port => cfg['pacs']['port'], :pacs_ae => cfg['pacs']['ae']
     set :wado_ip => cfg['wado']['ip'], :wado_port => cfg['wado']['port'], :wado_path => cfg['wado']['path']
   end
 
-  get '/sr/:acc_no' do
+  get '/:acc_no' do
     # "Hello #{params[:name]}!"
     acc_no = params[:acc_no]
 
