@@ -51,12 +51,12 @@ def pms_get_measurements(findings_item)
       has_measure = (item[CS] && item[CS].items[0][MVS])
       if has_measure
         site = item[CNCS].items[0][CM].value
-        measure = item[CS].items[0][MVS].items[0][NV].value
+        value = item[CS].items[0][MVS].items[0][NV].value
         unit = item[CS].items[0][MVS].items[0][MUCS].items[0][CM].value
 
         results.push({
           site:     site,
-          measure:  measure,
+          value:    value,
           unit:     unit
         })
       end
@@ -64,6 +64,22 @@ def pms_get_measurements(findings_item)
   end
 
   results.empty? ? nil : results
+end
+
+def pms_get_laterality(items)
+  items.each_item do |item|
+    return item[CCS].items[0][CM].value if item[CNCS].items[0][CM].value == "Laterality"
+  end
+  nil
+end
+
+def pms_get_value_unit(items)
+  items.each_item do |item|
+    if item[CNCS].items[0][CM].value == "Value"
+      return item[MVS].items[0][NV].value, item[MVS].items[0][MUCS].items[0][CM].value
+    end
+  end
+  return nil, nil
 end
 
 def pms_get_user_defined_measurements_calculations(udm_item)
@@ -76,12 +92,14 @@ def pms_get_user_defined_measurements_calculations(udm_item)
                   )
     if has_measure
       site = item[CS].items[0][TV].value
-      measure = item[CS].items[1][MVS].items[0][NV].value
-      unit = item[CS].items[1][MVS].items[0][MUCS].items[0][CM].value
+      side = pms_get_laterality(item[CS])
+      value, unit = pms_get_value_unit(item[CS])
+      #value = item[CS].items[1][MVS].items[0][NV].value
+      #unit = item[CS].items[1][MVS].items[0][MUCS].items[0][CM].value
 
       results.push({
         site:     site,
-        measure:  measure,
+        value:    value,
         unit:     unit
       })
     end
