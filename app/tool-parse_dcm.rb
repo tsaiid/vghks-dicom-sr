@@ -5,6 +5,7 @@ require './dicom-sr-ge.rb'
 require './dicom-sr-ge-r3.1.2.rb'
 require './dicom-sr-constrants.rb'
 require_relative 'dicom-sr-standardize.rb'
+require_relative 'dicom-sr-ge-vascular.rb'
 
 DICOM.logger.level = Logger::ERROR
 
@@ -17,22 +18,37 @@ def parse_dcm(path)
 
   if dcm[Mo].value == "SR"
     manufacturer = dcm[Ma].value
+    template = dcm[CTS].items[0][TI].value
 
     p path
     p dcm.value(SD)
 
-    case manufacturer
-    when "Philips Medical Systems"
-      result = pms_get_all_measurements(dcm)
-    when "GE Medical Systems"
-      result = gms_get_all_measurements(dcm[CS])
-    when "GE Healthcare"
-      result = gh_get_all_measurements(dcm[CS])
-    else
-      result = "#{manufacturer} is not supported yet."
-    end
+    case template
+    when '5100' # vascular
+      result = gev_get_all_measurements(dcm[CS])
 
-    p standardize_result(result)
+      p result
+    else  # others
+      case manufacturer
+      when "Philips Medical Systems"
+        result = pms_get_all_measurements(dcm)
+      when "GE Medical Systems"
+        if dcm[CTS].items[0][TI] == '5100'  # Vascular Ultrasound Report .
+        else
+          result = gms_get_all_measurements(dcm[CS])
+        end
+      when "GE Healthcare"
+        if dcm[CTS].items[0][TI] == '5100'  # Vascular Ultrasound Report .
+          result = gev_get_all_measurements(dcm[CS])
+        else
+          result = gh_get_all_measurements(dcm[CS])
+        end
+      else
+        result = "#{manufacturer} is not supported yet."
+      end
+
+      p standardize_result(result)
+    end
   end
 end
 
