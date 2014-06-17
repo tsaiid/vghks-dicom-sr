@@ -117,6 +117,16 @@ def pms_get_user_defined_measurements_calculations(udm_item)
   results.empty? ? nil : results
 end
 
+def pms_get_all_measurements(dcm)
+  fi_item = pms_find_findings_item(dcm)
+  ud_item = pms_find_user_defined_concepts_item(dcm)
+  fi_result = pms_get_measurements(fi_item)
+  ud_result = pms_get_user_defined_measurements_calculations(ud_item)
+  result = []
+  result += fi_result if fi_result
+  result += ud_result if ud_result
+end
+
 =begin
 # get patient characteristics item
 pc_item = find_patient_characteristics_item(dcm)

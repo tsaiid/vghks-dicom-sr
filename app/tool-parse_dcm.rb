@@ -23,9 +23,7 @@ def parse_dcm(path)
 
     case manufacturer
     when "Philips Medical Systems"
-      fi_item = pms_find_findings_item(dcm)
-      ud_item = pms_find_user_defined_concepts_item(dcm)
-      result = pms_get_measurements(fi_item) + pms_get_user_defined_measurements_calculations(ud_item)
+      result = pms_get_all_measurements(dcm)
     when "GE Medical Systems"
       result = gms_get_all_measurements(dcm[CS])
     when "GE Healthcare"
