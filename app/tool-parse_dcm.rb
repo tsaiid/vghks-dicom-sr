@@ -4,6 +4,7 @@ require './dicom-sr-philips.rb'
 require './dicom-sr-ge.rb'
 require './dicom-sr-ge-r3.1.2.rb'
 require './dicom-sr-constrants.rb'
+require_relative 'dicom-sr-standardize.rb'
 
 DICOM.logger.level = Logger::ERROR
 
@@ -24,15 +25,16 @@ def parse_dcm(path)
     when "Philips Medical Systems"
       fi_item = pms_find_findings_item(dcm)
       ud_item = pms_find_user_defined_concepts_item(dcm)
-      p pms_get_measurements(fi_item)
-      p pms_get_user_defined_measurements_calculations(ud_item)
+      result = pms_get_measurements(fi_item) + pms_get_user_defined_measurements_calculations(ud_item)
     when "GE Medical Systems"
-      p gms_get_all_measurements(dcm[CS])
+      result = gms_get_all_measurements(dcm[CS])
     when "GE Healthcare"
-      p gh_get_all_measurements(dcm[CS])
+      result = gh_get_all_measurements(dcm[CS])
     else
-      p "#{manufacturer} is not supported yet."
+      result = "#{manufacturer} is not supported yet."
     end
+
+    p standardize_result(result)
   end
 end
 
