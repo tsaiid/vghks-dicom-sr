@@ -13,6 +13,14 @@ def standardize_side(side)
   side
 end
 
+def define_units
+  Unit.define("m3") do |m3|
+    m3.definition   = Unit("1000 l")   # anything that results in a Unit object
+    m3.aliases      = ["cubic meter", "m3"]                   # array of synonyms for the unit
+    m3.display_name = "m3"                        # How unit is displayed when output
+  end
+end
+
 def standardize_value(site, value, unit)
   preferred_unit_by_site = {
     "kidney" => "cm",
@@ -23,6 +31,10 @@ def standardize_value(site, value, unit)
     "Prostate W" => "cm",
     "Prostate Vol" => "ml"
   }
+
+  # define units
+  # m3 is not supported by ruby-units by default
+  define_units
 
   # strange hack, ruby-units conversion sometimes results in rational scalar?!
   # follow this issue: https://github.com/olbrich/ruby-units/issues/102
