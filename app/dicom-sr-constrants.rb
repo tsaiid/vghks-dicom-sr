@@ -15,3 +15,5 @@ SV = "0018,1020"          # Software Version
 CCS = "0040,A168"         # Concept Code Sequence
 AN = "0008,0050"          # Accession Number
 SD = "0008,1030"          # StudyDescription
+CTS = "0040,A504"         # Content Template Sequence
+TI = "0040,DB00"          # Template Identifier
