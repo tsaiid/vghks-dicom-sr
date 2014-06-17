@@ -68,7 +68,15 @@ end
 
 def pms_get_laterality(items)
   items.each_item do |item|
-    return item[CCS].items[0][CM].value if item[CNCS].items[0][CM].value == "Laterality"
+    case item[CNCS].items[0][CM].value
+    when "Laterality"
+      return item[CCS].items[0][CM].value
+    when "Label"    # sometimes, the side is hidden in the Site section.
+      site = item.value(TV)
+      site.match(/^([LR]t) /) { |m|
+        return m[1]
+      }
+    end
   end
   nil
 end
@@ -99,6 +107,7 @@ def pms_get_user_defined_measurements_calculations(udm_item)
 
       results.push({
         site:     site,
+        side:     side,
         value:    value,
         unit:     unit
       })
