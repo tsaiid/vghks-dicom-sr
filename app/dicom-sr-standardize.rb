@@ -17,13 +17,22 @@ def standardize_value(site, value, unit)
   preferred_unit_by_site = {
     "kidney" => "cm",
     "spleen" => "cm",
-    "CBD" => "mm"
+    "CBD" => "mm",
+    "Prostate L" => "cm",
+    "Prostate H" => "cm",
+    "Prostate W" => "cm",
+    "Prostate Vol" => "ml"
   }
 
   # strange hack, ruby-units conversion sometimes results in rational scalar?!
   # follow this issue: https://github.com/olbrich/ruby-units/issues/102
-  converted_value = Unit(value + unit).convert_to(preferred_unit_by_site[site]).round(1)
-  converted_value.scalar.to_f.to_s + " " + preferred_unit_by_site[site]
+  if Unit(value + unit).units.empty?
+    {value: value, unit: unit}
+  else
+    #p "site: #{site}; value: #{value}; unit: #{unit}"
+    converted_value = Unit(value + unit).convert_to(preferred_unit_by_site[site]).round(1)
+    converted_value.scalar.to_f.to_s + " " + preferred_unit_by_site[site]
+  end
 end
 
 def standardize_result(results)
