@@ -63,14 +63,16 @@ def gms_get_all_measurements(items)
         site = gms_get_site(item[CS])
         measure = gms_get_measurement(item[CS])
 
-        result = {
-          side:     side,
-          site:     site,
-          value:    measure[:value],
-          unit:     measure[:unit]
-        }
+        if site
+          result = {
+            side:     side,
+            site:     site,
+            value:    measure[:value],
+            unit:     measure[:unit]
+          }
 
-        results.push(result) unless results.include?(result)
+          results.push(result) unless results.include?(result)
+        end
       end
     end
   end
