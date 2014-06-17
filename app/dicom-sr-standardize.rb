@@ -27,18 +27,24 @@ def standardize_value(site, value, unit)
 end
 
 def standardize_result(results)
-  standardized_result = []
+  standardized_result = {}
   if results
     results.each do |r|
       std_site = standardize_site(r[:site])
       #std_site = r[:site]
-      standardized_result << {
-        site: std_site,
-        side: standardize_side(r[:side]),
-        value: standardize_value(std_site, r[:value], r[:unit])
+      std_side = standardize_side(r[:side])
+      if std_side.nil?
+        standardized_result[std_site] = standardize_value(std_site, r[:value], r[:unit])
+      else
+        if standardized_result[std_site].nil?
+          standardized_result[std_site] = { std_side => standardize_value(std_site, r[:value], r[:unit]) }
+        else
+          standardized_result[std_site][std_side] = standardize_value(std_site, r[:value], r[:unit])
+        end
         #value: r[:value]+r[:unit]
-      }
+      end
     end
+    standardized_result[:debug] = results
   end
   return standardized_result.empty? ? nil : standardized_result
 end
