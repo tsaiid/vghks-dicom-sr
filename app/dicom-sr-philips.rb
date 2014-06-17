@@ -75,7 +75,7 @@ end
 
 def pms_get_value_unit(items)
   items.each_item do |item|
-    if item[CNCS].items[0][CM].value == "Value"
+    if ["Distance", "Value"].include? item[CNCS].items[0][CM].value
       return item[MVS].items[0][NV].value, item[MVS].items[0][MUCS].items[0][CM].value
     end
   end
