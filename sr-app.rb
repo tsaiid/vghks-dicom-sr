@@ -54,7 +54,9 @@ class DicomSR < Sinatra::Base
     # merge status
     status = dcm_parser_status unless dcm_parser_status.nil?
 
-    content_type :json
+    # strange behavior for AHK injected Ajax CORS request. The content type needs to be html rather than json ?!?!
+    #content_type :json
+    content_type :html
     { status: status, result: result }.to_json
   end
 end
