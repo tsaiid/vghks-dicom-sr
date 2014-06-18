@@ -1,9 +1,9 @@
 require 'dicom'
 include DICOM
-require './dicom-sr-philips.rb'
-require './dicom-sr-ge.rb'
-require './dicom-sr-ge-r3.1.2.rb'
-require './dicom-sr-constrants.rb'
+require_relative 'dicom-sr-philips.rb'
+require_relative 'dicom-sr-ge.rb'
+require_relative 'dicom-sr-ge-r3.1.2.rb'
+require_relative 'dicom-sr-constrants.rb'
 require_relative 'dicom-sr-standardize.rb'
 require_relative 'dicom-sr-ge-vascular.rb'
 require_relative 'dicom-sr-ph-vascular.rb'
