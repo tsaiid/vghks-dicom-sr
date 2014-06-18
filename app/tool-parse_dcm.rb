@@ -6,6 +6,7 @@ require './dicom-sr-ge-r3.1.2.rb'
 require './dicom-sr-constrants.rb'
 require_relative 'dicom-sr-standardize.rb'
 require_relative 'dicom-sr-ge-vascular.rb'
+require_relative 'dicom-sr-ph-vascular.rb'
 
 DICOM.logger.level = Logger::ERROR
 
@@ -25,7 +26,12 @@ def parse_dcm(path)
 
     case template
     when '5100' # vascular
-      result = gev_get_all_measurements(dcm[CS])
+      case manufacturer
+      when "Philips Medical Systems"
+        result = phv_get_all_measurements(dcm[CS])
+      else
+        result = gev_get_all_measurements(dcm[CS])
+      end
 
       p result
     else  # others
