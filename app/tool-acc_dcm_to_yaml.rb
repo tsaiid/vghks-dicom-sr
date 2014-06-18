@@ -45,8 +45,13 @@ wado_url = "http://#{settings.wado_ip}:#{settings.wado_port}/#{settings.wado_pat
 #p wado_url
 dcm = nil
 begin
-  open(wado_url) {|f|
-    dcm = DObject.parse(f.read)
+  open(wado_url) {|uri|
+    dcm_file = uri.read
+    dcm = DObject.parse(dcm_file)
+    fname = dcm.value(AN) + ".dcm"
+    File.open(fname, "w") do |f|
+      f.write dcm_file
+    end
   }
 rescue OpenURI::HTTPError => error
   response = error.io
