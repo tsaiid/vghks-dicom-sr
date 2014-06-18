@@ -18,6 +18,8 @@ class DicomSR < Sinatra::Base
     # set server info
     set :pacs_ip => cfg['pacs']['ip'], :pacs_port => cfg['pacs']['port'], :pacs_ae => cfg['pacs']['ae']
     set :wado_ip => cfg['wado']['ip'], :wado_port => cfg['wado']['port'], :wado_path => cfg['wado']['path']
+
+    enable :cross_origin
   end
 
   get '/:acc_no' do
