@@ -29,6 +29,9 @@ class DicomSR < Sinatra::Base
     # parse dcm
     dcm_parser_status, result = parse_dcm(dcm)
 
+    # merge status
+    status = dcm_parser_status unless dcm_parser_status.nil?
+
     content_type :json
     { status: status, result: result }.to_json
   end
