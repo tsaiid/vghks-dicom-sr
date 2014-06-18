@@ -2,6 +2,7 @@ require 'rubygems'
 require 'bundler/setup'
 
 require 'sinatra'
+require 'sinatra/cross_origin'
 require 'yaml'
 require 'json'
 require_relative 'app/parse-dcm.rb'
