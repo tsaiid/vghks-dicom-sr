@@ -19,13 +19,13 @@ def parse_dcm(path)
 
   if dcm[Mo].value == "SR"
     manufacturer = dcm[Ma].value
-    template = dcm[CTS].items[0][TI].value
+    study = dcm[SD].value
 
     p path
     p dcm.value(SD)
 
-    case template
-    when '5100' # vascular
+    case study
+    when 'Sono & Doppler, Carotid art.-PCU' # vascular
       case manufacturer
       when "Philips Medical Systems"
         result = phv_get_all_measurements(dcm[CS])
