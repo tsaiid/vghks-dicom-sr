@@ -2,7 +2,6 @@ require 'rubygems'
 require 'bundler/setup'
 
 require 'sinatra'
-require 'sinatra/cross_origin'
 require 'yaml'
 require 'json'
 require_relative 'app/parse-dcm.rb'
@@ -10,8 +9,6 @@ require_relative 'app/dicom-sr-get-dcm-by-acc.rb'
 require_relative 'app/format-result.rb'
 
 class DicomSR < Sinatra::Base
-  register Sinatra::CrossOrigin
-
   configure do
     # read config file
     cfg = YAML.load_file('../../shared/config.yaml') # production env
@@ -20,8 +17,6 @@ class DicomSR < Sinatra::Base
     # set server info
     set :pacs_ip => cfg['pacs']['ip'], :pacs_port => cfg['pacs']['port'], :pacs_ae => cfg['pacs']['ae']
     set :wado_ip => cfg['wado']['ip'], :wado_port => cfg['wado']['port'], :wado_path => cfg['wado']['path']
-
-    enable :cross_origin
   end
 
   get '/:acc_no' do
@@ -45,10 +40,7 @@ class DicomSR < Sinatra::Base
   end
 
   get '/:acc_no/json' do
-    cross_origin :allow_origin => '*',
-      :allow_methods => [:get],
-      :allow_credentials => false,
-      :max_age => "60"
+    response.headers['Access-Control-Allow-Origin'] = '*'
 
     # "Hello #{params[:name]}!"
     acc_no = params[:acc_no]
