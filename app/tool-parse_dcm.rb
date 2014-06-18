@@ -39,16 +39,9 @@ def parse_dcm(path)
       when "Philips Medical Systems"
         result = pms_get_all_measurements(dcm)
       when "GE Medical Systems"
-        if dcm[CTS].items[0][TI] == '5100'  # Vascular Ultrasound Report .
-        else
-          result = gms_get_all_measurements(dcm[CS])
-        end
+        result = gms_get_all_measurements(dcm[CS])
       when "GE Healthcare"
-        if dcm[CTS].items[0][TI] == '5100'  # Vascular Ultrasound Report .
-          result = gev_get_all_measurements(dcm[CS])
-        else
-          result = gh_get_all_measurements(dcm[CS])
-        end
+        result = gh_get_all_measurements(dcm[CS])
       else
         result = "#{manufacturer} is not supported yet."
       end
