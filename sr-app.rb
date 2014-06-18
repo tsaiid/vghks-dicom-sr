@@ -10,6 +10,7 @@ require_relative 'app/dicom-sr-get-dcm-by-acc.rb'
 require_relative 'app/format-result.rb'
 
 class DicomSR < Sinatra::Base
+  register Sinatra::CrossOrigin
 
   configure do
     # read config file
@@ -44,6 +45,11 @@ class DicomSR < Sinatra::Base
   end
 
   get '/:acc_no/json' do
+    cross_origin :allow_origin => '*',
+      :allow_methods => [:get],
+      :allow_credentials => false,
+      :max_age => "60"
+
     # "Hello #{params[:name]}!"
     acc_no = params[:acc_no]
 
@@ -59,5 +65,4 @@ class DicomSR < Sinatra::Base
     content_type :json
     { status: status, result: result }.to_json
   end
-
 end
