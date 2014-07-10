@@ -1,3 +1,9 @@
+GIT
+  remote: https://github.com/dicom/ruby-dicom.git
+  revision: 3e3b758f2aaa1f01af990d12139fed2f91ec3e5c
+  specs:
+    dicom (0.9.6)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -12,7 +18,6 @@ GEM
       capistrano (~> 3.0)
       sshkit (~> 1.2)
     colorize (0.7.3)
-    dicom (0.9.5)
     i18n (0.6.9)
     net-scp (1.2.1)
       net-ssh (>= 2.6.5)
@@ -21,6 +26,7 @@ GEM
     rack-protection (1.5.3)
       rack
     rake (10.3.2)
+    rmagick (2.13.2)
     ruby-units (1.4.5)
     sinatra (1.4.5)
       rack (~> 1.4)
@@ -39,6 +45,7 @@ DEPENDENCIES
   capistrano
   capistrano-bundler
   capistrano-rvm
-  dicom
+  dicom!
+  rmagick
   ruby-units
   sinatra

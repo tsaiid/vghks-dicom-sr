@@ -1,7 +1,8 @@
 source 'https://rubygems.org'
 
 gem 'sinatra'
-gem 'dicom'
+gem 'rmagick'
+gem 'dicom', :git => "https://github.com/dicom/ruby-dicom.git"
 gem 'ruby-units'
 gem 'capistrano'
 gem 'capistrano-bundler'
