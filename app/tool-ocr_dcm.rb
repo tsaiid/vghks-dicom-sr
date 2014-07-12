@@ -1,4 +1,9 @@
 require 'rtesseract'
+require 'dicom'
+include DICOM
+require_relative 'dicom-sr-constrants.rb'
+
+DICOM.logger.level = Logger::ERROR
 
 def real_tag(ocr_text)
   case ocr_text
@@ -15,8 +20,7 @@ def real_tag(ocr_text)
   end
 end
 
-def ocr_dcm(path)
-
+def ocr_spg(path)
   image = RTesseract.new(path) do |img|
     img = img.white_threshold(10)
     img = img.quantize(256,Magick::GRAYColorspace)
@@ -24,18 +28,31 @@ def ocr_dcm(path)
 
   ocr_result = image.to_s.split(/\n/).keep_if {|v| v =~ /=/}
 
-  rt = {}
-  lt = {}
+  result = {
+    right: {},
+    left: {}
+  }
   ocr_result.each do |r|
     r.match(/(\w+)\s+=.+?([\d\.]{3,6}).+?([\d\.]{3,6})$/) do |m|
-      rt[real_tag(m[1])] = m[2]
-      lt[real_tag(m[1])] = m[3]
+      result[:right][real_tag(m[1])] = m[2]
+      result[:left][real_tag(m[1])] = m[3]
     end
   end
+  result
+end
 
-  p path
-  p rt
-  p lt
+def ocr_dcm(path)
+  # check study description
+  dcm = DObject.read(path)
+  case dcm[SD].value
+  when "SPG For vein"
+    result = ocr_spg(path)
+  when "Segmental pressures - 3or4 Cuff"
+  when "Spectrum analysis"
+    # cannot do anything
+  end
+
+  p result
 end
 
 # if given a file, parse it only, else parse the whole directory
