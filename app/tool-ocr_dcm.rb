@@ -64,13 +64,15 @@ def ocr_spg(path)
     right: {},
     left: {}
   }
+  has_result = false
   ocr_result.each do |r|
     r.match(/(\w+)\s+=.+?([\d\.]{3,6}).+?([\d\.]{3,6})$/) do |m|
       result[:right][real_tag(m[1])] = m[2]
       result[:left][real_tag(m[1])] = m[3]
+      has_result = true
     end
   end
-  result
+  has_result ? result : nil
 end
 
 def ocr_seg(path)
