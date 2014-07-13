@@ -1,6 +1,7 @@
 require 'dicom'
 include DICOM
 require_relative 'dicom-sr-constrants.rb'
+require 'yaml'
 require 'rmagick'
 require 'ostruct'
 require 'open-uri'
