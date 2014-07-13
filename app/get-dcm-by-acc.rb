@@ -2,11 +2,11 @@ require 'dicom'
 include DICOM
 require 'open-uri'
 
-def get_sr_dcm_by_acc_no(acc_no)
+def get_dcm_by_acc_no(acc_no, type = "SR")
   node = DClient.new(settings.pacs_ip, settings.pacs_port, { host_ae: settings.pacs_ae })
   #study = node.find_studies({"0008,0050" => acc_no})
   #series = node.find_series({"0008,0050" => acc_no, "0008,0060" => "SR"})
-  images = node.find_images({"0008,0050" => acc_no, "0008,0060" => "SR"})
+  images = node.find_images({"0008,0050" => acc_no, "0008,0060" => type})
   if images.empty?
     return {error: 1, message: "No SR object for accession number: #{acc_no}"}, nil
   end

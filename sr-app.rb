@@ -5,7 +5,8 @@ require 'sinatra'
 require 'yaml'
 require 'json'
 require_relative 'app/parse-dcm.rb'
-require_relative 'app/dicom-sr-get-dcm-by-acc.rb'
+require_relative 'app/ocr-dcm.rb'
+require_relative 'app/get-dcm-by-acc.rb'
 require_relative 'app/format-result.rb'
 
 class DicomSR < Sinatra::Base
@@ -46,13 +47,34 @@ class DicomSR < Sinatra::Base
     acc_no = params[:acc_no]
 
     # Check if SR exists by AccNo
-    status, dcm = get_sr_dcm_by_acc_no(acc_no)
+    status, dcm = get_dcm_by_acc_no(acc_no, "SR")
 
     # parse dcm
     dcm_parser_status, result = parse_dcm(dcm)
 
     # merge status
     status = dcm_parser_status unless dcm_parser_status.nil?
+
+    # strange behavior for AHK injected Ajax CORS request. The content type needs to be html rather than json ?!?!
+    #content_type :json
+    content_type :html
+    { status: status, result: result }.to_json
+  end
+
+  get '/ocr/:acc_no/json' do
+    response.headers['Access-Control-Allow-Origin'] = '*'
+
+    # "Hello #{params[:name]}!"
+    acc_no = params[:acc_no]
+
+    # Check if SR exists by AccNo
+    status, dcm = get_dcm_by_acc_no(acc_no, "OT")
+
+    # parse dcm
+    dcm_ocr_status, result = ocr_dcm(dcm)
+
+    # merge status
+    status = dcm_ocr_status unless dcm_ocr_status.nil?
 
     # strange behavior for AHK injected Ajax CORS request. The content type needs to be html rather than json ?!?!
     #content_type :json
