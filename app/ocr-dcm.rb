@@ -9,6 +9,8 @@ def ocr_dcm(dcm)
   if dcm
     # save to a temp file
     f = Tempfile.new('ocr')
+    dcm.write(f.path)
+    f.close
 
     # determine the study description
     study = dcm[SD].value
