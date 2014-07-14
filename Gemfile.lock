@@ -27,6 +27,7 @@ GEM
       rack
     rake (10.3.2)
     rmagick (2.13.2)
+    rtesseract (1.2.2)
     ruby-units (1.4.5)
     sinatra (1.4.5)
       rack (~> 1.4)
@@ -47,5 +48,6 @@ DEPENDENCIES
   capistrano-rvm
   dicom!
   rmagick
+  rtesseract
   ruby-units
   sinatra
