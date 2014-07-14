@@ -8,7 +8,7 @@ def get_dcm_by_acc_no(acc_no, type = "SR")
   #series = node.find_series({"0008,0050" => acc_no, "0008,0060" => "SR"})
   images = node.find_images({"0008,0050" => acc_no, "0008,0060" => type})
   if images.empty?
-    return {error: 1, message: "No SR object for accession number: #{acc_no}"}, nil
+    return {error: 1, message: "No #{type} object for accession number: #{acc_no}"}, nil
   end
 
   # get image from WADO
