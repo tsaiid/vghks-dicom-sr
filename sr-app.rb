@@ -20,7 +20,7 @@ class DicomSR < Sinatra::Base
     set :wado_ip => cfg['wado']['ip'], :wado_port => cfg['wado']['port'], :wado_path => cfg['wado']['path']
   end
 
-  get '/:acc_no' do
+  get '/sr/:acc_no' do
     # "Hello #{params[:name]}!"
     acc_no = params[:acc_no]
 
@@ -40,7 +40,7 @@ class DicomSR < Sinatra::Base
     result_text
   end
 
-  get '/:acc_no/json' do
+  get '/sr/:acc_no/json' do
     response.headers['Access-Control-Allow-Origin'] = '*'
 
     # "Hello #{params[:name]}!"
