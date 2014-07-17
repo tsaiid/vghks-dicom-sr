@@ -5,21 +5,18 @@ require_relative 'dicom-sr-constrants.rb'
 require_relative 'ocr-spg.rb'
 require_relative 'ocr-seg.rb'
 
-def ocr_dcm(dcm)
-  if dcm
-    # save to a temp file
-    f = Tempfile.new('ocr')
-    dcm.write(f.path)
-    f.close
+def ocr_dcm(dcm_path)
+  dcm = DObject.read(dcm_path)
 
+  if dcm
     # determine the study description
     study = dcm[SD].value
 
     case study
     when "SPG For vein"
-      result = ocr_spg(f.path)
+      result = ocr_spg(dcm_path)
     when "Segmental pressures - 3or4 Cuff"
-      result = ocr_seg(f.path)
+      result = ocr_seg(dcm_path)
     else
       # including "Spectrum analysis"
       # cannot do anything
@@ -32,9 +29,6 @@ def ocr_dcm(dcm)
         message: "No recognizable data in this OT image."
       }
     end
-
-    # unlink the temp file
-    f.unlink
   end
 
   return status, result

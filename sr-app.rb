@@ -4,6 +4,7 @@ require 'bundler/setup'
 require 'sinatra'
 require 'yaml'
 require 'json'
+require 'tempfile'
 require_relative 'app/parse-dcm.rb'
 require_relative 'app/ocr-dcm.rb'
 require_relative 'app/get-dcm-by-acc.rb'
@@ -70,8 +71,19 @@ class DicomSR < Sinatra::Base
     # Check if SR exists by AccNo
     status, dcm = get_dcm_by_acc_no(acc_no, "OT")
 
-    # parse dcm
-    dcm_ocr_status, result = ocr_dcm(dcm)
+    # save temp file and convert by gdcm
+    if dcm
+      fg = Tempfile.new('gdcm')
+      fd = Tempfile.new('dcm')
+      dcm.write(fd.path)
+      `gdcmconv -w #{fd.path} #{fg.path}`
+      fd.unlink
+
+      # parse dcm
+      dcm_ocr_status, result = ocr_dcm(fg.path)
+
+      fg.unlink
+    end
 
     # merge status
     status = dcm_ocr_status unless dcm_ocr_status.nil?
