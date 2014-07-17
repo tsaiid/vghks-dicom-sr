@@ -2,6 +2,7 @@
 require 'rtesseract'
 require 'dicom'
 include DICOM
+require 'tempfile'
 require_relative 'dicom-sr-constrants.rb'
 
 DICOM.logger.level = Logger::ERROR
@@ -125,9 +126,15 @@ if ARGV.first.nil?
   dcm_path = "/Users/tsaiid/Dropbox/dcm"
 
   Dir.glob(dcm_path + "/*.dcm").each do |file|
+    f = Tempfile.new('gdcm')
+    `gdcmconv -w #{file} #{f.path}`
     p file
-    ocr_dcm(file)
+    ocr_dcm(f.path)
+    f.unlink
   end
 else
-  ocr_dcm(ARGV.first)
+  f = Tempfile.new('gdcm')
+  `gdcmconv -w #{ARGV.first} #{f.path}`
+  ocr_dcm(f.path)
+  f.unlink
 end
