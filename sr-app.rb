@@ -14,8 +14,7 @@ require_relative 'app/format-result.rb'
 class DicomSR < Sinatra::Base
   configure do
     # read config file
-    cfg = YAML.load_file('../../shared/config.yaml') # production env
-    #cfg = YAML.load_file('app/config.yaml') # development env
+    cfg = YAML.load_file('config/config.yaml')
 
     # set server info
     set :pacs_ip => cfg['pacs']['ip'], :pacs_port => cfg['pacs']['port'], :pacs_ae => cfg['pacs']['ae']
