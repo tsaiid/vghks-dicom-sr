@@ -5,6 +5,7 @@ require 'sinatra'
 require 'yaml'
 require 'json'
 require 'tempfile'
+require 'benchmark'
 require_relative 'app/parse-dcm.rb'
 require_relative 'app/ocr-dcm.rb'
 require_relative 'app/get-dcm-by-acc.rb'
@@ -72,18 +73,24 @@ class DicomSR < Sinatra::Base
     status, dcm = get_dcm_by_acc_no(acc_no, "OT")
 
     # save temp file and convert by gdcm
-    if dcm
-      fg = Tempfile.new('gdcm')
-      fd = Tempfile.new('dcm')
-      dcm.write(fd.path)
-      `gdcmconv -w #{fd.path} #{fg.path}`
-      fd.unlink
+    dcm_ocr_status = nil
+    result = nil
+    realtime = Benchmark.realtime do
+      if dcm
+        fg = Tempfile.new('gdcm')
+        fd = Tempfile.new('dcm')
+        dcm.write(fd.path)
+        `gdcmconv -w #{fd.path} #{fg.path}`
+        fd.unlink
 
-      # parse dcm
-      dcm_ocr_status, result = ocr_dcm(fg.path)
+        # parse dcm
+        dcm_ocr_status, result = ocr_dcm(fg.path)
 
-      fg.unlink
+        fg.unlink
+      end
     end
+
+    status[:realtime] = realtime
 
     # merge status
     status = dcm_ocr_status unless dcm_ocr_status.nil?
