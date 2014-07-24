@@ -3,6 +3,7 @@ require 'rtesseract'
 require 'dicom'
 include DICOM
 require 'tempfile'
+require 'benchmark'
 require_relative 'dicom-sr-constrants.rb'
 
 DICOM.logger.level = Logger::ERROR
@@ -108,14 +109,19 @@ end
 def ocr_dcm(path)
   # check study description
   dcm = DObject.read(path)
-  case dcm[SD].value
-  when "SPG For vein"
-    result = ocr_spg(path)
-  when "Segmental pressures - 3or4 Cuff"
-    result = ocr_seg(path)
-  when "Spectrum analysis"
-    # cannot do anything
+  result = nil
+  realtime = Benchmark.realtime do
+    case dcm[SD].value
+    when "SPG For vein"
+      result = ocr_spg(path)
+    when "Segmental pressures - 3or4 Cuff"
+      result = ocr_seg(path)
+    when "Spectrum analysis"
+      # cannot do anything
+    end
   end
+
+  result[:realtime] = realtime
 
   p result
 end
