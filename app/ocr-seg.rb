@@ -1,37 +1,3 @@
-require 'rtesseract'
-require 'RMagick'
-
-class RTesseract
-  # Class to read an image from specified areas
-  class MyMixed < Mixed
-    def labeled_area(x, y, width, height, label)
-      @value = ''
-      @areas << { :x => x,  :y => y, :width => width, :height => height, :label => label }
-    end
-
-    # Convert parts of image to string
-    def convert_with_label
-      @value = {}
-      @areas.each_with_object(RTesseract.new(@source.to_s, @options.dup)) do |area, image|
-        image.crop!(area[:x], area[:y], area[:width], area[:height])
-        @value[area[:label]] = image.to_s.gsub(/\n+/, '')
-      end
-    rescue => error
-      raise RTesseract::ConversionError.new(error)
-    end
-
-    # Output with label
-    def to_s_with_label
-      if @source.file?
-        convert_with_label
-        @value
-      else
-        fail RTesseract::ImageNotSelectedError.new(@source)
-      end
-    end
-  end
-end
-
 def ocr_seg(path)
   # crop image to small
   img = Magick::Image.read(path).first

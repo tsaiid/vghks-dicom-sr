@@ -1,39 +1,22 @@
-require 'rtesseract'
-
-def real_tag(ocr_text)
-  case ocr_text
-  when "V0"
-    "VO"
-  when "00"
-    "OC"
-  when "03"
-    "O3"
-  when "05"
-    "O5"
-  else
-    ocr_text
-  end
-end
-
 def ocr_spg(path)
-  image = RTesseract.new(path) do |img|
-    img = img.white_threshold(10)
-    img = img.quantize(256,Magick::GRAYColorspace)
-  end
+  # crop image to small
+  img = Magick::Image.read(path).first
+  img = img.quantize(256, Magick::GRAYColorspace) # increase OCR accuracy
 
-  ocr_result = image.to_s.split(/\n/).keep_if {|v| v =~ /=/}
+  areas = [
+    { x: 658, y: 1162, w: 83, h: 25, l: "RtVO"},
+    { x: 753, y: 1162, w: 83, h: 25, l: "LtVO"},
 
-  result = {
-    right: {},
-    left: {}
-  }
-  has_result = false
-  ocr_result.each do |r|
-    r.match(/(\w+)\s+=.+?([\d\.]{3,6}).+?([\d\.]{3,6})$/) do |m|
-      result[:right][real_tag(m[1])] = m[2]
-      result[:left][real_tag(m[1])] = m[3]
-      has_result = true
-    end
+    { x: 674, y: 1192, w: 68, h: 24, l: "RtVC" },
+    { x: 770, y: 1192, w: 68, h: 24, l: "LtVC" },
+
+    { x: 674, y: 1224, w: 68, h: 24, l: "RtAF" },
+    { x: 770, y: 1224, w: 68, h: 24, l: "LtAF" }
+  ]
+
+  ocr_result = tesseract_areas(img, areas)
+
+  ocr_result.each do |k, v|
+    ocr_result[k] = ("%.1f" % v.to_f) if v.length > 0
   end
-  has_result ? result : nil
 end
