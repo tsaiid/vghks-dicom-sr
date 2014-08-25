@@ -14,7 +14,7 @@ acc_no = ARGV.first
 
 # read config.yaml
 # read config file
-cfg = YAML.load_file('config.yaml') # development env
+cfg = YAML.load_file('../config/config.yaml') # development env
 settings = OpenStruct.new(
   :pacs_ip => cfg['pacs']['ip'],
   :pacs_port => cfg['pacs']['port'],
