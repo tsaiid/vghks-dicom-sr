@@ -1,6 +1,8 @@
 def ocr_seg(path)
   # crop image to small
   img = Magick::Image.read(path).first
+  img = img.quantize(256, Magick::GRAYColorspace) # increase OCR accuracy
+
   areas = [
     { x: 470, y: 870, w: 68, h: 41, l: "RtABI"},
     { x: 730, y: 870, w: 68, h: 41, l: "LtABI"},
