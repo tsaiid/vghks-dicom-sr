@@ -7,6 +7,7 @@ require_relative 'dicom-sr-constrants.rb'
 require_relative 'dicom-sr-standardize.rb'
 require_relative 'dicom-sr-ge-vascular.rb'
 require_relative 'dicom-sr-ph-vascular.rb'
+require_relative 'dicom-sr-ge-lunar.rb'
 
 DICOM.logger.level = Logger::ERROR
 
@@ -32,6 +33,10 @@ def parse_dcm(path)
       else
         result = gev_get_all_measurements(dcm[CS])
       end
+
+      p result
+    when /^Bone densitometry/
+      result = gelunar_all_measurements(dcm[CS])
 
       p result
     else  # others
