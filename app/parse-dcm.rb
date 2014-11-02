@@ -7,9 +7,11 @@ require_relative 'dicom-sr-ge-r3.1.2.rb'
 require_relative 'dicom-sr-standardize.rb'
 require_relative 'dicom-sr-ge-vascular.rb'
 require_relative 'dicom-sr-ph-vascular.rb'
+require_relative 'dicom-sr-ge-lunar.rb'
 
-def parse_dcm(dcm)
-  if dcm
+def parse_dcm(dcms)
+  result = {}
+  dcms.to_a.each do |dcm|
     manufacturer = dcm[Ma].value
     study = dcm[SD].value
 
@@ -21,6 +23,8 @@ def parse_dcm(dcm)
       else
         result = gev_get_all_measurements(dcm[CS])
       end
+    when /^Bone densitometry/
+      result = result.merge(gelunar_all_measurements(dcm[CS]))
     else  # others
       case manufacturer
       when "Philips Medical Systems"
@@ -35,13 +39,13 @@ def parse_dcm(dcm)
 
       result = standardize_result(result)
     end
+  end
 
-    if result.nil?
-      status = {
-        error: 1,
-        message: "No fetchable data in this SR."
-      }
-    end
+  if result.nil?
+    status = {
+      error: 1,
+      message: "No fetchable data in this SR."
+    }
   end
 
   return status, result

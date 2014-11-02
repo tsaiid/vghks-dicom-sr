@@ -12,23 +12,27 @@ def get_dcm_by_acc_no(acc_no, type = "SR")
   end
 
   # get image from WADO
-  image = images.first
-  wado_url = "http://#{settings.wado_ip}:#{settings.wado_port}/#{settings.wado_path}/?" +
-             "&requestType=WADO" +
-             "&studyUID=" + image["0020,000D"] +
-             "&seriesUID=" + image["0020,000E"] +
-             "&objectUID=" + image["0008,0018"]
+  dcms = []
+  images.each do |image|
+    #image = images.first
+    wado_url = "http://#{settings.wado_ip}:#{settings.wado_port}/#{settings.wado_path}/?" +
+               "&requestType=WADO" +
+               "&studyUID=" + image["0020,000D"] +
+               "&seriesUID=" + image["0020,000E"] +
+               "&objectUID=" + image["0008,0018"]
 
-  #p wado_url
-  dcm = nil
-  begin
-    open(wado_url) {|f|
-      dcm = DObject.parse(f.read)
-    }
-  rescue OpenURI::HTTPError => error
-    response = error.io
-    return response.status, nil
+    #p wado_url
+    dcm = nil
+    begin
+      open(wado_url) {|f|
+        dcm = DObject.parse(f.read)
+        dcms << dcm
+      }
+    rescue OpenURI::HTTPError => error
+      response = error.io
+      return response.status, nil
+    end
   end
 
-  return {error: 0, message: ""}, dcm
+  return {error: 0, message: ""}, dcms
 end

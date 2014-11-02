@@ -26,13 +26,13 @@ class DicomSR < Sinatra::Base
     acc_no = params[:acc_no]
 
     # Check if SR exists by AccNo
-    status, dcm = get_sr_dcm_by_acc_no(acc_no)
+    status, dcms = get_dcm_by_acc_no(acc_no, "SR")
 
     # parse dcm
-    dcm_parser_status, result = parse_dcm(dcm)
+    dcm_parser_status, result = parse_dcm(dcms)
 
     # format result
-    result_text = format_result(dcm, result)
+    result_text = format_result(dcms, result)
 
     # merge status
     #status = dcm_parser_status unless dcm_parser_status.nil?
@@ -48,10 +48,10 @@ class DicomSR < Sinatra::Base
     acc_no = params[:acc_no]
 
     # Check if SR exists by AccNo
-    status, dcm = get_dcm_by_acc_no(acc_no, "SR")
+    status, dcms = get_dcm_by_acc_no(acc_no, "SR")
 
     # parse dcm
-    dcm_parser_status, result = parse_dcm(dcm)
+    dcm_parser_status, result = parse_dcm(dcms)
 
     # merge status
     status = dcm_parser_status unless dcm_parser_status.nil?

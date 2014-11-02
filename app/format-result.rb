@@ -2,7 +2,8 @@ require 'dicom'
 include DICOM
 require_relative 'dicom-sr-constrants.rb'
 
-def format_result(dcm, parsed_hash)
+def format_result(dcms, parsed_hash)
+  dcm = dcms.first
   if dcm
     study = dcm.value(SD)
     case study
