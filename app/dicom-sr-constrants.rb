@@ -17,3 +17,6 @@ AN = "0008,0050"          # Accession Number
 SD = "0008,1030"          # StudyDescription
 CTS = "0040,A504"         # Content Template Sequence
 TI = "0040,DB00"          # Template Identifier
+StudyDate = "0008,0020"   # StudyDate
+PBD = "0010,0030"         # PatientBirthDate
+PatientSex = "0010,0040"  # PatientSex
