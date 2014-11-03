@@ -1,5 +1,6 @@
 require 'dicom'
 include DICOM
+require 'date'
 require_relative 'dicom-sr-constrants.rb'
 
 def format_result(dcms, parsed_hash)
@@ -10,7 +11,7 @@ def format_result(dcms, parsed_hash)
     when "Sono, Upper abdomen", "Sono, Lower abdomen"
       return format_upper_lower_abdomen(parsed_hash)
     when /^Bone densitometry/
-      return format_bone_density(parsed_hash)
+      return format_bone_density(dcm, parsed_hash)
     end
   end
   parsed_hash.to_s
@@ -84,16 +85,33 @@ def format_bd_conclusion(t_or_z, lowest_score)
     else
       category = "normal limit"
     end
-    str += "The BMD meets the criteria of #{category}, according to the WHO (World Health Organiz    ation) classification."
+    str += "The BMD meets the criteria of #{category}, according to the WHO (World Health Organization) classification."
   when "Z"
     category = (lowest_score <= -2 ? "below" : "within")
     str += "The BMD meets the criteria was #{category} the expected range of age, according to 2007 ISCD (the International Society for Clinical Densitometry) combined official positions.\n\n(Z-score of -2.0 or lower is defined as 'below the expected range for age', and a Z-score above -2.0 is 'within the expected range for age')"
   end
 end
 
-def format_bone_density(result_hash)
+def determine_t_or_z(dcm_first)
+  if dcm_first
+    age = (Date.parse(dcm_first[StudyDate].value) - Date.parse(dcm_first[PBD].value)).to_i / 365.25
+    sex = dcm_first[PatientSex].value
+
+    case sex
+    when "M"
+      age > 50 ? "T" : "Z"
+    when "F"
+      menopause_age = 45  # for debug now.
+      menopause_age || age > 55 ? "T" : "Z"
+    end
+  end
+
+  "T" # default return "T"
+end
+
+def format_bone_density(dcm, result_hash)
   str = ""
-  t_or_z = "Z"  # for debug only. will be determined by age and menopause age.
+  t_or_z = determine_t_or_z(dcm)
   sides = ["Right", "Left"]
   key_map = { score: {
                 "T" => "BMD_TSCORE",
