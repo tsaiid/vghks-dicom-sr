@@ -177,10 +177,20 @@ def format_bone_density(dcm, result_hash)
           femur_bmd = neck_bmd
           femur_percent = neck_percent
         elsif neck_score == total_score
-          if neck_percent <= total_percent
+          if neck_percent < total_percent
             femur_score = neck_score
             femur_bmd = neck_bmd
             femur_percent = neck_percent
+          elsif neck_percent = total_percent
+            if neck_bmd < total_bmd
+              femur_score = neck_score
+              femur_bmd = neck_bmd
+              femur_percent = neck_percent
+            else
+              femur_score = total_score
+              femur_bmd = total_bmd
+              femur_percent = total_percent
+            end
           else
             femur_score = total_score
             femur_bmd = total_bmd
