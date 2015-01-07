@@ -82,5 +82,5 @@ def gelunar_get_mp_age(dcm)
     end
   end
 
-  mp_age.empty? ? nil : mp_age
+  mp_age.nil? || mp_age.empty? ? nil : mp_age
 end
