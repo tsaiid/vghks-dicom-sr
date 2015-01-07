@@ -41,6 +41,28 @@ class DicomSR < Sinatra::Base
     result_text
   end
 
+  get '/sr/:acc_no/report' do
+    response.headers['Access-Control-Allow-Origin'] = '*'
+
+    # "Hello #{params[:name]}!"
+    acc_no = params[:acc_no]
+
+    # Check if SR exists by AccNo
+    status, dcms = get_dcm_by_acc_no(acc_no, "SR")
+
+    # parse dcm
+    dcm_parser_status, result = parse_dcm(dcms)
+
+    # format result
+    result_text = format_result(dcms, result)
+
+    # merge status
+    #status = dcm_parser_status unless dcm_parser_status.nil?
+
+    content_type :html
+    { status: status, report: result_text }.to_json
+  end
+
   get '/sr/:acc_no/json' do
     response.headers['Access-Control-Allow-Origin'] = '*'
 
@@ -52,6 +74,9 @@ class DicomSR < Sinatra::Base
 
     # parse dcm
     dcm_parser_status, result = parse_dcm(dcms)
+
+    # format result
+    result_text = format_result(dcms, result)
 
     # merge status
     status = dcm_parser_status unless dcm_parser_status.nil?
