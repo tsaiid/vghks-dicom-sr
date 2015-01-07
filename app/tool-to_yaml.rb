@@ -1,3 +1,6 @@
+require 'rubygems'
+require 'bundler/setup'
+
 require 'dicom'
 include DICOM
 require_relative 'dicom-sr-constrants.rb'
