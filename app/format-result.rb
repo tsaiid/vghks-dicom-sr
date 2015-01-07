@@ -109,10 +109,11 @@ def determine_t_or_z(dcm_first, mp_age)
     when "F"
       # menopause_age = 45  # for debug now.
       mp_age || age > 55 ? "T" : "Z"
+    else
+      "T" # default return "T"
     end
-  end
 
-  "T" # default return "T"
+  end
 end
 
 def format_bone_density(dcm, result_hash)
