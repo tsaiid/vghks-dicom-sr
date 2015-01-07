@@ -11,6 +11,7 @@ require_relative 'dicom-sr-ge-lunar.rb'
 
 def parse_dcm(dcms)
   result = {}
+  tmp_result = [] # for debug
   dcms.to_a.each do |dcm|
     manufacturer = dcm[Ma].value
     study = dcm[SD].value
@@ -24,7 +25,22 @@ def parse_dcm(dcms)
         result = gev_get_all_measurements(dcm[CS])
       end
     when /^Bone densitometry/
-      result = result.merge(gelunar_all_measurements(dcm[CS]))
+      result = result.merge(gelunar_all_measurements(dcm[CS])) do |key, v1, v2|
+        # Dirty Hack
+        ## The output of shorter hash will miss data, choose the longer for merging.
+        ## Better solution: may need recursive merge
+        if (v1.is_a?(Hash) && v2.is_a?(Hash))
+          v1.length > v2.length ? v1 : v2
+        else
+          v2
+        end
+      end
+      if (dcm[PatientSex].value == "F" && result[:mp_age].nil?)
+        result[:mp_age] = gelunar_get_mp_age(dcm)
+      end
+
+      # for debug
+      tmp_result << gelunar_all_measurements(dcm[CS])
     else  # others
       case manufacturer
       when "Philips Medical Systems"
@@ -39,6 +55,11 @@ def parse_dcm(dcms)
 
       result = standardize_result(result)
     end
+  end
+
+  # for debug
+  unless tmp_result.empty?
+    result[:debug] = tmp_result
   end
 
   if result.nil?
