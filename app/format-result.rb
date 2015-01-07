@@ -53,7 +53,9 @@ def format_upper_lower_abdomen(result_hash)
   str
 end
 
-def format_bd_general(t_or_z, percent, score)
+def format_bd_general(t_or_z, percent_str, score)
+  percent = percent_str.sub(" ", "")
+
   case t_or_z
   when "T"
     str = "and is about #{percent} of the mean of young reference value (T-score = #{score})."
@@ -70,6 +72,10 @@ end
 
 def format_bd_femur(t_or_z, side, bmd, percent, score)
   str = "The BMD of #{side.downcase} proximal femur is #{bmd}, " + format_bd_general(t_or_z, percent, score)
+end
+
+def format_bd_forearm(t_or_z, side, bmd, percent, score)
+  str = "The BMD of #{side.downcase} 1/3 forearm is #{bmd}, " + format_bd_general(t_or_z, percent, score)
 end
 
 def format_bd_conclusion(t_or_z, lowest_score)
@@ -92,7 +98,7 @@ def format_bd_conclusion(t_or_z, lowest_score)
   end
 end
 
-def determine_t_or_z(dcm_first)
+def determine_t_or_z(dcm_first, mp_age)
   if dcm_first
     age = (Date.parse(dcm_first[StudyDate].value) - Date.parse(dcm_first[PBD].value)).to_i / 365.25
     sex = dcm_first[PatientSex].value
@@ -101,8 +107,8 @@ def determine_t_or_z(dcm_first)
     when "M"
       age > 50 ? "T" : "Z"
     when "F"
-      menopause_age = 45  # for debug now.
-      menopause_age || age > 55 ? "T" : "Z"
+      # menopause_age = 45  # for debug now.
+      mp_age || age > 55 ? "T" : "Z"
     end
   end
 
@@ -111,7 +117,7 @@ end
 
 def format_bone_density(dcm, result_hash)
   str = ""
-  t_or_z = determine_t_or_z(dcm)
+  t_or_z = determine_t_or_z(dcm, result_hash[:mp_age])
   sides = ["Right", "Left"]
   key_map = { score: {
                 "T" => "BMD_TSCORE",
@@ -159,6 +165,13 @@ def format_bone_density(dcm, result_hash)
         total_score = tmp_hash["Total #{side}"][key_map[:score][t_or_z]].to_f
         total_percent = tmp_hash["Total #{side}"][key_map[:percent][t_or_z]]
         total_bmd = tmp_hash["Total #{side}"]["BMD"]
+
+        # for debug if missing sr data.
+        if (neck_score.nil? || neck_percent.nil? || neck_bmd.nil? ||
+            total_score.nil? || total_percent.nil? || total_bmd.nil? )
+          p result_hash
+        end
+
         if neck_score < total_score
           femur_score = neck_score
           femur_bmd = neck_bmd
@@ -182,6 +195,19 @@ def format_bone_density(dcm, result_hash)
         str += format_bd_femur(t_or_z, side, femur_bmd, femur_percent, femur_score)
         all_scores << femur_score.to_f
       end
+    end
+  end
+
+  # Forearm
+  sides.each do |side|
+    tmp_hash = result_hash["#{side} Forearm"]
+    if tmp_hash
+      radius_33_score = tmp_hash["Radius 33%"][key_map[:score][t_or_z]].to_f
+      radius_33_percent = tmp_hash["Radius 33%"][key_map[:percent][t_or_z]]
+      radius_33_bmd = tmp_hash["Radius 33%"]["BMD"]
+
+      str += format_bd_forearm(t_or_z, side, radius_33_bmd, radius_33_percent, radius_33_score)
+      all_scores << radius_33_score.to_f
     end
   end
 
