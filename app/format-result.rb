@@ -112,7 +112,6 @@ def determine_t_or_z(dcm_first, mp_age)
     else
       "T" # default return "T"
     end
-
   end
 end
 
