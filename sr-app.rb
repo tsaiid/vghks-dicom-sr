@@ -94,12 +94,13 @@ class DicomSR < Sinatra::Base
     acc_no = params[:acc_no]
 
     # Check if SR exists by AccNo
-    status, dcm = get_dcm_by_acc_no(acc_no, "OT")
+    status, dcm = get_dcm_by_acc_no(acc_no, "OT", 1)
 
     # save temp file and convert by gdcm
     dcm_ocr_status = nil
     result = nil
     realtime = Benchmark.realtime do
+      dcm = dcm.first
       if dcm
         fg = Tempfile.new('gdcm')
         fd = Tempfile.new('dcm')
