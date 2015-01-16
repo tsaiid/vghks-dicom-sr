@@ -38,33 +38,34 @@ if images.empty?
 end
 
 # get image from WADO
-image = images.first
-wado_url = "http://#{settings.wado_ip}:#{settings.wado_port}/#{settings.wado_path}/?" +
-           "&requestType=WADO" +
-           "&studyUID=" + image["0020,000D"] +
-           "&seriesUID=" + image["0020,000E"] +
-           "&objectUID=" + image["0008,0018"]
+images.each_with_index do |image, i|
+  wado_url = "http://#{settings.wado_ip}:#{settings.wado_port}/#{settings.wado_path}/?" +
+             "&requestType=WADO" +
+             "&studyUID=" + image["0020,000D"] +
+             "&seriesUID=" + image["0020,000E"] +
+             "&objectUID=" + image["0008,0018"]
 
-#p wado_url
-dcm = nil
-begin
-  open(wado_url) {|uri|
-    dcm_file = uri.read
-    dcm = DObject.parse(dcm_file)
-    fname = dcm.value(AN) + ".dcm"
+  #p wado_url
+  dcm = nil
+  begin
+    open(wado_url) {|uri|
+      dcm_file = uri.read
+      dcm = DObject.parse(dcm_file)
+      fname = dcm.value(AN) + (images.size > 1 ? "_" + i.to_s : "") + ".dcm"
+      File.open(fname, "w") do |f|
+        f.write dcm_file
+      end
+    }
+  rescue OpenURI::HTTPError => error
+    response = error.io
+    return response.status, nil
+  end
+
+  if dcm
+    # convert to yaml
+    fname = dcm.value(AN) + (images.size > 1 ? "_" + i.to_s : "") + ".yaml"
     File.open(fname, "w") do |f|
-      f.write dcm_file
+      f.write dcm.to_yaml
     end
-  }
-rescue OpenURI::HTTPError => error
-  response = error.io
-  return response.status, nil
-end
-
-if dcm
-  # convert to yaml
-  fname = dcm.value(AN) + ".yaml"
-  File.open(fname, "w") do |f|
-    f.write dcm.to_yaml
   end
 end
