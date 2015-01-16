@@ -115,6 +115,40 @@ def determine_t_or_z(dcm_first, mp_age)
   end
 end
 
+def determine_femur_level(neck_score, neck_percent, neck_bmd, total_score, total_percent, total_bmd)
+  if neck_score < total_score
+    femur_score = neck_score
+    femur_bmd = neck_bmd
+    femur_percent = neck_percent
+  elsif neck_score == total_score
+    if neck_percent < total_percent
+      femur_score = neck_score
+      femur_bmd = neck_bmd
+      femur_percent = neck_percent
+    elsif neck_percent = total_percent
+      if neck_bmd < total_bmd
+        femur_score = neck_score
+        femur_bmd = neck_bmd
+        femur_percent = neck_percent
+      else
+        femur_score = total_score
+        femur_bmd = total_bmd
+        femur_percent = total_percent
+      end
+    else
+      femur_score = total_score
+      femur_bmd = total_bmd
+      femur_percent = total_percent
+    end
+  else
+    femur_score = total_score
+    femur_bmd = total_bmd
+    femur_percent = total_percent
+  end
+
+  [femur_score, femur_bmd, femur_percent]
+end
+
 def format_bone_density(dcm, result_hash)
   str = ""
   t_or_z = determine_t_or_z(dcm, result_hash[:mp_age])
@@ -172,35 +206,24 @@ def format_bone_density(dcm, result_hash)
           p result_hash
         end
 
-        if neck_score < total_score
-          femur_score = neck_score
-          femur_bmd = neck_bmd
-          femur_percent = neck_percent
-        elsif neck_score == total_score
-          if neck_percent < total_percent
-            femur_score = neck_score
-            femur_bmd = neck_bmd
-            femur_percent = neck_percent
-          elsif neck_percent = total_percent
-            if neck_bmd < total_bmd
-              femur_score = neck_score
-              femur_bmd = neck_bmd
-              femur_percent = neck_percent
-            else
-              femur_score = total_score
-              femur_bmd = total_bmd
-              femur_percent = total_percent
-            end
-          else
-            femur_score = total_score
-            femur_bmd = total_bmd
-            femur_percent = total_percent
-          end
-        else
-          femur_score = total_score
-          femur_bmd = total_bmd
-          femur_percent = total_percent
-        end
+        femur_score, femur_bmd, femur_percent = determine_femur_level(neck_score, neck_percent, neck_bmd, total_score, total_percent, total_bmd)
+
+        str += format_bd_femur(t_or_z, side, femur_bmd, femur_percent, femur_score)
+        all_scores << femur_score.to_f
+      end
+    end
+  else # Sometimes it sends "Left Femur" and "Right Femur"
+    sides.each do |side|
+      tmp_hash = result_hash["#{side} Femur"]
+      if tmp_hash
+        neck_score = tmp_hash["Neck"][key_map[:score][t_or_z]].to_f
+        neck_percent = tmp_hash["Neck"][key_map[:percent][t_or_z]]
+        neck_bmd = tmp_hash["Neck"]["BMD"]
+        total_score = tmp_hash["Total"][key_map[:score][t_or_z]].to_f
+        total_percent = tmp_hash["Total"][key_map[:percent][t_or_z]]
+        total_bmd = tmp_hash["Total"]["BMD"]
+
+        femur_score, femur_bmd, femur_percent = determine_femur_level(neck_score, neck_percent, neck_bmd, total_score, total_percent, total_bmd)
 
         str += format_bd_femur(t_or_z, side, femur_bmd, femur_percent, femur_score)
         all_scores << femur_score.to_f
