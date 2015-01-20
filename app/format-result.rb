@@ -79,23 +79,26 @@ def format_bd_forearm(t_or_z, side, bmd, percent, score)
 end
 
 def format_bd_conclusion(t_or_z, lowest_score)
-  category = ""
-  str = "Conclusion:\n"
+  if lowest_score
+    category = ""
+    str = "Conclusion:\n"
 
-  case t_or_z
-  when "T"
-    if lowest_score <= -2.5
-      category = "osteoporosis"
-    elsif lowest_score < -1.0
-      category = "low bone mass"
-    else
-      category = "normal limit"
+    case t_or_z
+    when "T"
+      if lowest_score <= -2.5
+        category = "osteoporosis"
+      elsif lowest_score < -1.0
+        category = "low bone mass"
+      else
+        category = "normal limit"
+      end
+      str += "The BMD meets the criteria of #{category}, according to the WHO (World Health Organization) classification."
+    when "Z"
+      category = (lowest_score <= -2 ? "below" : "within")
+      str += "The BMD meets the criteria was #{category} the expected range of age, according to 2007 ISCD (the International Society for Clinical Densitometry) combined official positions.\n\n(Z-score of -2.0 or lower is defined as 'below the expected range for age', and a Z-score above -2.0 is 'within the expected range for age')"
     end
-    str += "The BMD meets the criteria of #{category}, according to the WHO (World Health Organization) classification."
-  when "Z"
-    category = (lowest_score <= -2 ? "below" : "within")
-    str += "The BMD meets the criteria was #{category} the expected range of age, according to 2007 ISCD (the International Society for Clinical Densitometry) combined official positions.\n\n(Z-score of -2.0 or lower is defined as 'below the expected range for age', and a Z-score above -2.0 is 'within the expected range for age')"
   end
+  str
 end
 
 def determine_t_or_z(dcm_first, mp_age)
@@ -149,6 +152,22 @@ def determine_femur_level(neck_score, neck_percent, neck_bmd, total_score, total
   [femur_score, femur_bmd, femur_percent]
 end
 
+def non_outlier_level(outlier)
+    defined_non_outlier_level = {
+      "L1" => "L2-L4",
+      "L2" => "L1-L4 (L2)",
+      "L3" => "L1-L4 (L3)",
+      "L4" => "L1-L3",
+      "L1L2" => "L3-L4",
+      "L1L3" => "L2-L4 (L3)",
+      "L1L4" => "L2-L3",
+      "L2L3" => "L1-L4 (!!!!!)",
+      "L2L4" => "L1-L3 (L2)",
+      "L3L4" => "L1-L2"
+    }
+    defined_non_outlier_level[outlier.join]
+end
+
 def format_bone_density(dcm, result_hash)
   str = ""
   t_or_z = determine_t_or_z(dcm, result_hash[:mp_age])
@@ -160,10 +179,29 @@ def format_bone_density(dcm, result_hash)
                 "T" => "BMD_PYA",
                 "Z" => "BMD_PAM"} }
   all_scores = []
+  spine_score = []
+  spine_non_outlier_score = []
+  outlier = nil
 
   # AP Spine
   tmp_hash = result_hash["AP Spine"]
   if tmp_hash
+    # Detect outlier
+    not_outliers = []
+    spine = tmp_hash.clone.keep_if {|level| level =~ /^L\d$/}
+    spine.each do |k, v|
+      tmp_spine = spine.clone.delete_if {|kk| kk == k}
+      tmp_spine.values.each do |vv|
+        if ((vv[key_map[:score][t_or_z]].to_f - v[key_map[:score][t_or_z]].to_f).abs <= 1)
+          not_outliers << k
+          break
+        end
+      end
+    end
+    outlier = spine.keys - not_outliers
+    p outlier
+
+    # Find max length level
     max_delta = 0
     max_level = nil
     max_val = nil
@@ -184,7 +222,23 @@ def format_bone_density(dcm, result_hash)
       percent = max_val[key_map[:percent][t_or_z]]
 
       str += format_bd_spine(t_or_z, max_level, bmd, percent, score)
-      all_scores << score.to_f
+      spine_score << score.to_f
+    end
+
+    if (!outlier.empty?)
+      p outlier.to_s
+      level = non_outlier_level(outlier)
+      if (level != max_level)
+        str += "OUTLIER presents: #{outlier.join(", ")}\n"
+        if (tmp_hash[level])
+          bmd = tmp_hash[level]["BMD"]
+          score = tmp_hash[level][key_map[:score][t_or_z]]
+          percent = tmp_hash[level][key_map[:percent][t_or_z]]
+
+          str += "Suggested: " + format_bd_spine(t_or_z, level, bmd, percent, score)
+          spine_non_outlier_score << score.to_f
+        end
+      end
     end
   end
 
@@ -245,5 +299,12 @@ def format_bone_density(dcm, result_hash)
   end
 
   # Conclusion
-  str += format_bd_conclusion(t_or_z, all_scores.min)
+  conclusion = format_bd_conclusion(t_or_z, (all_scores + spine_score).min)
+  p spine_non_outlier_score
+  non_outlier_conclusion = format_bd_conclusion(t_or_z, (all_scores + spine_non_outlier_score).min)
+  str += conclusion
+  if (!outlier.empty? && !spine_non_outlier_score.empty? && (conclusion != non_outlier_conclusion))
+    str += "\nSuggested: " + non_outlier_conclusion
+  end
+  str
 end
