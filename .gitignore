@@ -18,3 +18,4 @@
 # Capistrano
 Capfile
 /config
+/.capistrano
