@@ -7,4 +7,4 @@ gem 'dicom', :git => "https://github.com/dicom/ruby-dicom.git"
 gem 'ruby-units'
 gem 'capistrano'
 gem 'capistrano-bundler'
-gem 'capistrano-rvm'
+gem 'rvm-capistrano'
