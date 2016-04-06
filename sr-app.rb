@@ -93,8 +93,8 @@ class DicomSR < Sinatra::Base
     # "Hello #{params[:name]}!"
     acc_no = params[:acc_no]
 
-    # Check if SR exists by AccNo
-    status, dcm = get_dcm_by_acc_no(acc_no, "OT", 1)
+    # Check if DCM exists by AccNo
+    status, dcm = get_dcm_by_acc_no(acc_no, "SC", 1)
 
     # save temp file and convert by gdcm
     dcm_ocr_status = nil
