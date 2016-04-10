@@ -19,14 +19,14 @@ end
 
 def define_units
   Unit.define("m3") do |m3|
-    m3.definition   = Unit("1000 l")   # anything that results in a Unit object
+    m3.definition   = Unit.new("1000 l")   # anything that results in a Unit object
     m3.aliases      = ["cubic meter", "m3"]                   # array of synonyms for the unit
     m3.display_name = "m3"                        # How unit is displayed when output
   end
 
   # mm3 is pre-defined, but seems wrong???
   Unit.define("mm3") do |mm3|
-    mm3.definition   = Unit("0.001 ml")   # anything that results in a Unit object
+    mm3.definition   = Unit.new("0.001 ml")   # anything that results in a Unit object
     mm3.aliases      = ["cubic millimeter", "mm3"]                   # array of synonyms for the unit
     mm3.display_name = "mm3"                        # How unit is displayed when output
   end
@@ -62,11 +62,11 @@ def standardize_value(site, value, unit)
 
   # strange hack, ruby-units conversion sometimes results in rational scalar?!
   # follow this issue: https://github.com/olbrich/ruby-units/issues/102
-  if Unit(value + unit).units.empty?
+  if Unit.new(value + unit).units.empty?
     {value: value, unit: unit}
   else
     #p "site: #{site}; value: #{value}; unit: #{unit}"
-    converted_value = Unit(value + unit).convert_to(preferred_unit(site, unit)).round(1)
+    converted_value = Unit.new(value + unit).convert_to(preferred_unit(site, unit)).round(1)
     converted_value.scalar.to_f.to_s + " " + preferred_unit(site, unit)
   end
 end
