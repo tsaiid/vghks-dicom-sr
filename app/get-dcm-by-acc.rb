@@ -2,8 +2,8 @@ require 'dicom'
 include DICOM
 require 'open-uri'
 
-def get_dcm_by_acc_no(acc_no, type = "SR", want_count = 0)
-  node = DClient.new(settings.pacs_ip, settings.pacs_port, { host_ae: settings.pacs_ae })
+def get_dcm_by_acc_no(acc_no, type = "SR", want_count = 0, srvcfg)
+  node = DClient.new(srvcfg['pacs']['ip'], srvcfg['pacs']['port'], { host_ae: srvcfg['pacs']['ae'] })
   #study = node.find_studies({"0008,0050" => acc_no})
   #series = node.find_series({"0008,0050" => acc_no, "0008,0060" => "SR"})
   images = node.find_images({"0008,0050" => acc_no, "0008,0060" => type})
@@ -15,7 +15,7 @@ def get_dcm_by_acc_no(acc_no, type = "SR", want_count = 0)
   dcms = []
   images.each do |image|
     #image = images.first
-    wado_url = "http://#{settings.wado_ip}:#{settings.wado_port}/#{settings.wado_path}/?" +
+    wado_url = "http://#{srvcfg['wado']['ip']}:#{srvcfg['wado']['port']}/#{srvcfg['wado']['path']}/?" +
                "&requestType=WADO" +
                "&studyUID=" + image["0020,000D"] +
                "&seriesUID=" + image["0020,000E"] +

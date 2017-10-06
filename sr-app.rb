@@ -17,8 +17,7 @@ class DicomSR < Sinatra::Base
     cfg = YAML.load_file('config/config.yaml')
 
     # set server info
-    set :pacs_ip => cfg['pacs']['ip'], :pacs_port => cfg['pacs']['port'], :pacs_ae => cfg['pacs']['ae']
-    set :wado_ip => cfg['wado']['ip'], :wado_port => cfg['wado']['port'], :wado_path => cfg['wado']['path']
+    set :srvcfg => { 'pacs' => cfg['pacs'], 'wado' => cfg['wado'] }
   end
 
   get '/sr/:acc_no' do
@@ -26,7 +25,7 @@ class DicomSR < Sinatra::Base
     acc_no = params[:acc_no]
 
     # Check if SR exists by AccNo
-    status, dcms = get_dcm_by_acc_no(acc_no, "SR")
+    status, dcms = get_dcm_by_acc_no(acc_no, "SR", 0, settings.srvcfg)
 
     # parse dcm
     dcm_parser_status, result = parse_dcm(dcms)
@@ -48,7 +47,7 @@ class DicomSR < Sinatra::Base
     acc_no = params[:acc_no]
 
     # Check if SR exists by AccNo
-    status, dcms = get_dcm_by_acc_no(acc_no, "SR")
+    status, dcms = get_dcm_by_acc_no(acc_no, "SR", 0, settings.srvcfg)
 
     # parse dcm
     dcm_parser_status, result = parse_dcm(dcms)
@@ -70,7 +69,7 @@ class DicomSR < Sinatra::Base
     acc_no = params[:acc_no]
 
     # Check if SR exists by AccNo
-    status, dcms = get_dcm_by_acc_no(acc_no, "SR")
+    status, dcms = get_dcm_by_acc_no(acc_no, "SR", 0, settings.srvcfg)
 
     # parse dcm
     dcm_parser_status, result = parse_dcm(dcms)
@@ -94,7 +93,7 @@ class DicomSR < Sinatra::Base
     acc_no = params[:acc_no]
 
     # Check if DCM exists by AccNo
-    status, dcm = get_dcm_by_acc_no(acc_no, "SC", 1)
+    status, dcm = get_dcm_by_acc_no(acc_no, "SC", 1, settings.srvcfg)
 
     # save temp file and convert by gdcm
     dcm_ocr_status = nil
