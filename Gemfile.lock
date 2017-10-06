@@ -1,40 +1,45 @@
 GIT
   remote: https://github.com/dicom/ruby-dicom.git
-  revision: 2041818bfb4da6fe0091b939540c62e338f8d8cd
+  revision: efe2ca6446e486fa28be1d49b2bb70cc13a0a82e
   specs:
-    dicom (0.9.7a)
+    dicom (0.9.7)
 
 GEM
   remote: https://rubygems.org/
   specs:
-    capistrano (3.4.0)
+    airbrussh (1.3.0)
+      sshkit (>= 1.6.1, != 1.7.0)
+    capistrano (3.9.1)
+      airbrussh (>= 1.0.0)
       i18n
       rake (>= 10.0.0)
-      sshkit (~> 1.3)
-    capistrano-bundler (1.1.4)
+      sshkit (>= 1.9.0)
+    capistrano-bundler (1.3.0)
       capistrano (~> 3.1)
       sshkit (~> 1.2)
     capistrano-rvm (0.1.2)
       capistrano (~> 3.0)
       sshkit (~> 1.2)
-    i18n (0.7.0)
+    i18n (0.8.6)
+    mustermann (1.0.1)
     net-scp (1.2.1)
       net-ssh (>= 2.6.5)
-    net-ssh (3.1.1)
-    rack (1.6.4)
-    rack-protection (1.5.3)
+    net-ssh (4.2.0)
+    rack (2.0.3)
+    rack-protection (2.0.0)
       rack
-    rake (11.1.2)
-    rmagick (2.15.4)
-    ruby-units (2.0.0)
-    sinatra (1.4.7)
-      rack (~> 1.5)
-      rack-protection (~> 1.4)
-      tilt (>= 1.3, < 3)
-    sshkit (1.9.0)
+    rake (12.1.0)
+    rmagick (2.16.0)
+    ruby-units (2.2.0)
+    sinatra (2.0.0)
+      mustermann (~> 1.0)
+      rack (~> 2.0)
+      rack-protection (= 2.0.0)
+      tilt (~> 2.0)
+    sshkit (1.14.0)
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
-    tilt (2.0.2)
+    tilt (2.0.8)
 
 PLATFORMS
   ruby
@@ -48,5 +53,8 @@ DEPENDENCIES
   ruby-units
   sinatra
 
+RUBY VERSION
+   ruby 2.4.2p198
+
 BUNDLED WITH
-   1.11.2
+   1.16.0.pre.3
