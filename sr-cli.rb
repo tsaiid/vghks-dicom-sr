@@ -1,5 +1,6 @@
-require 'rubygems'
-require 'bundler/setup'
+# rubygems and bundler are not easily setup in Windows
+#require 'rubygems'
+#require 'bundler/setup'
 
 require 'yaml'
 require 'json'
@@ -9,7 +10,7 @@ require_relative 'app/get-dcm-by-acc.rb'
 require_relative 'app/format-result.rb'
 
 # set server info
-cfg = YAML.load_file('config/config.yaml')
+cfg = YAML.load_file(File.join(__dir__, 'config/config.yaml'))
 srvcfg = {
   'pacs' => cfg['pacs'],
   'wado' => cfg['wado']
