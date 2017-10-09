@@ -5,7 +5,7 @@ require_relative 'dicom-sr-constrants.rb'
 
 def format_result(dcms, parsed_hash)
   dcm = dcms.to_a.first
-  if dcm
+  if dcm and parsed_hash
     study = dcm.value(SD)
     case study
     when "Sono, Upper abdomen", "Sono, Lower abdomen"
